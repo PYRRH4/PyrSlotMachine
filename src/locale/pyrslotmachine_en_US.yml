@@ -1,0 +1,7 @@
+# Locale : en_US
+
+# Messages
+
+messages:
+  win: '&2PyrSlotMachine >> &7You won &a$ITEM &a!'
+  lose: '&4PyrSlotMachine >> &7You didn''t win anything this time.'
