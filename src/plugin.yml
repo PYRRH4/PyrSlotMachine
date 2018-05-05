@@ -4,7 +4,7 @@ description: 'Gamble easily with this nice machine.'
 author: PYRRH4
 website: www.pyrrh4.be
 # Techy
-version: 1.0.0
+version: 1.0.1
 main: be.pyrrh4.pyrslotmachine.PyrSlotMachine
 depend: [PyrCore]
 # Commands

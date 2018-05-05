@@ -16,6 +16,9 @@ import be.pyrrh4.core.gui.ItemData;
 import be.pyrrh4.core.messenger.Messenger;
 import be.pyrrh4.core.messenger.Messenger.Level;
 import be.pyrrh4.core.util.Utils;
+import be.pyrrh4.pyrslotmachine.commands.CommandCreate;
+import be.pyrrh4.pyrslotmachine.commands.CommandSetbutton;
+import be.pyrrh4.pyrslotmachine.commands.CommandSetcase;
 import be.pyrrh4.pyrslotmachine.machine.Machine;
 import be.pyrrh4.pyrslotmachine.machine.MachineType;
 import be.pyrrh4.pyrslotmachine.machine.RunningMachine;
@@ -103,10 +106,9 @@ public class PyrSlotMachine extends PyrPlugin implements Listener {
 	protected void enable() {
 		// call reload
 		innerReload();
-		// register command
-		Commands.registerCommands(new Command(this, "machine", "machine", null));
-		// register listener
+		// registration
 		Bukkit.getPluginManager().registerEvents(this, this);
+		registerCommand(new Command(this, "machine", "machine", new CommandCreate(), new CommandSetcase(), new CommandSetbutton()));
 	}
 
 	// ----------------------------------------------------------------------
