@@ -4,10 +4,14 @@ description: 'Gamble easily with this nice machine.'
 author: PYRRH4
 website: www.pyrrh4.be
 # Techy
-version: 1.0.1
+version: 1.0.4
+api-version: 1.13
 main: be.pyrrh4.pyrslotmachine.PyrSlotMachine
 depend: [PyrCore]
 # Commands
 commands:
   machine:
-    aliases: [slotmachine]
+    aliases: [pyrslotmachine,slotmachine]
+permissions:
+  pyrslotmachine.admin:
+    default: op

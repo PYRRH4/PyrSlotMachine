@@ -2,37 +2,41 @@ package be.pyrrh4.pyrslotmachine.commands;
 
 import org.bukkit.entity.Player;
 
+import be.pyrrh4.core.Perm;
+import be.pyrrh4.core.command.CommandArgument;
 import be.pyrrh4.core.command.CommandCall;
-import be.pyrrh4.core.command.CommandPattern;
-import be.pyrrh4.core.messenger.Messenger;
-import be.pyrrh4.core.messenger.Messenger.Level;
+import be.pyrrh4.core.command.Param;
+import be.pyrrh4.core.messenger.Locale;
+import be.pyrrh4.core.util.Utils;
 import be.pyrrh4.pyrslotmachine.PyrSlotMachine;
 import be.pyrrh4.pyrslotmachine.machine.Machine;
 import be.pyrrh4.pyrslotmachine.machine.MachineType;
 
-public class CommandCreate extends CommandPattern {
+public class CommandCreate extends CommandArgument {
+
+	private static final Param paramMachine = new Param(Utils.asList("machine", "m"), "id", Perm.PYRSLOTMACHINE_ADMIN, true);
+	private static final Param paramType = new Param(Utils.asList("type", "t"), "id", Perm.PYRSLOTMACHINE_ADMIN, true);
 
 	public CommandCreate() {
-		super("create [string]%id [string]%type", "create a machine", "pyrslotmachine.admin", true);
+		super(PyrSlotMachine.instance(), Utils.asList("create", "new"), "create a machine", Perm.PYRSLOTMACHINE_ADMIN, true, paramMachine, paramType);
 	}
 
 	@Override
 	public void perform(CommandCall call) {
 		Player sender = call.getSenderAsPlayer();
-		String id = call.getArgAsString(this, 1).toLowerCase();
-		if (PyrSlotMachine.instance().getData().getMachine(id) != null) {
-			Messenger.send(sender, Level.SEVERE_INFO, "PyrSlotMachine", "A machine with id " + id + " already exists.");
-			return;
+		String id = paramMachine.getStringAlphanumeric(call);
+		MachineType type = paramType.get(call, PyrSlotMachine.MACHINETYPE_PARSER);
+		if (id != null && type != null) {
+			// already taken
+			if (PyrSlotMachine.instance().getData().getMachine(id) != null) {
+				Locale.MSG_GENERIC_NAMETAKEN.getActive().send(sender, "{plugin}", PyrSlotMachine.instance().getName(), "{name}", id);
+				return;
+			}
+			// create
+			Machine machine = new Machine(id, type);
+			PyrSlotMachine.instance().getData().addMachine(machine);
+			Locale.MSG_PYRSLOTMACHINE_CREATE.getActive().send(sender, "{id}", id);
 		}
-		String typeS = call.getArgAsString(this, 2).toLowerCase();
-		MachineType type = PyrSlotMachine.instance().getMachineType(typeS);
-		if (type == null) {
-			Messenger.send(sender, Level.SEVERE_INFO, "PyrSlotMachine", "Machine type " + typeS + " doesn't exists in the configuration.");
-			return;
-		}
-		Machine machine = new Machine(id, typeS);
-		PyrSlotMachine.instance().getData().addMachine(machine).save();
-		Messenger.send(sender, Level.NORMAL_SUCCESS, "PyrSlotMachine", "Machine " + id + " has been created.");
 	}
 
 }

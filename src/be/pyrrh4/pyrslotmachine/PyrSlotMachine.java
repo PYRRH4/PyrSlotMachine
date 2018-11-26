@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,8 +12,11 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import be.pyrrh4.core.PyrPlugin;
-import be.pyrrh4.core.command.Command;
+import be.pyrrh4.core.command.CommandRoot;
+import be.pyrrh4.core.command.Param;
+import be.pyrrh4.core.command.ParamParser;
 import be.pyrrh4.core.gui.ItemData;
+import be.pyrrh4.core.messenger.Locale;
 import be.pyrrh4.core.messenger.Messenger;
 import be.pyrrh4.core.messenger.Messenger.Level;
 import be.pyrrh4.core.util.Utils;
@@ -43,6 +47,36 @@ public class PyrSlotMachine extends PyrPlugin implements Listener {
 	// Fields
 	// ----------------------------------------------------------------------
 
+	// static fields
+	public static final ParamParser<Machine> MACHINE_PARSER = new ParamParser<Machine>() {
+		@Override
+		public Machine parse(CommandSender sender, Param parameter, String value) {
+			// doesn't exist
+			Machine machine = PyrSlotMachine.instance().getData().getMachine(value);
+			if (machine == null) {
+				Locale.MSG_PYRSLOTMACHINE_INVALIDMACHINEPARAM.getActive().send("{parameter}", parameter.toString(), "{value}", value);
+				return null;
+			}
+			// exists
+			return machine;
+		}
+	};
+
+	public static final ParamParser<MachineType> MACHINETYPE_PARSER = new ParamParser<MachineType>() {
+		@Override
+		public MachineType parse(CommandSender sender, Param parameter, String value) {
+			// doesn't exist
+			MachineType machine = PyrSlotMachine.instance().getMachineType(value);
+			if (machine == null) {
+				Locale.MSG_PYRSLOTMACHINE_INVALIDMACHINETYPEPARAM.getActive().send("{parameter}", parameter.toString(), "{value}", value);
+				return null;
+			}
+			// exists
+			return machine;
+		}
+	};
+
+	// fields
 	private PyrSlotMachineData data;
 	private HashMap<String, MachineType> types = new HashMap<String, MachineType>();
 
@@ -60,26 +94,27 @@ public class PyrSlotMachine extends PyrPlugin implements Listener {
 	// ----------------------------------------------------------------------
 
 	@Override
-	protected void initStorage() {
+	protected void loadStorage() {
 		data = Utils.getPluginData(PyrSlotMachineData.class);
 	}
 
 	@Override
-	protected void savePluginData() {
-		data.save();
+	protected void saveStorage() {
+		data.saveData();
 	}
 
 	@Override
-	protected void forceCloseUserPluginData() {}
+	protected void closeUserData() {
+	}
 
 	// ----------------------------------------------------------------------
-	// Init
+	// Pre enable
 	// ----------------------------------------------------------------------
 
 	@Override
-	protected void init() {
-		getSettings().localeDefault("pyrslotmachine_en_US.yml");
-		getSettings().localeConfigName("locale");
+	protected boolean preEnable() {
+		this.spigotResourceId = 55107;
+		return true;
 	}
 
 	// ----------------------------------------------------------------------
@@ -87,14 +122,13 @@ public class PyrSlotMachine extends PyrPlugin implements Listener {
 	// ----------------------------------------------------------------------
 
 	@Override
-	protected void innerReload() {
+	protected void reloadInner() {
 		// load types
 		types.clear();
-		for (String type : getConfiguration().getKeysForSection("types", false)) {
-			type = type.toLowerCase();
-			double cost = PyrSlotMachine.instance().getConfiguration().getInt("types." + type + ".cost");
-			ArrayList<ItemData> prizes = PyrSlotMachine.instance().getConfiguration().getItems("types." + type + ".prizes", "", "");
-			types.put(type, new MachineType(cost, prizes));
+		for (String id : getConfiguration().getKeysForSection("types", false)) {
+			double cost = PyrSlotMachine.instance().getConfiguration().getInt("types." + id + ".cost");
+			ArrayList<ItemData> prizes = PyrSlotMachine.instance().getConfiguration().getItems("types." + id + ".prizes");
+			types.put(id, new MachineType(id, cost, prizes));
 		}
 	}
 
@@ -103,12 +137,17 @@ public class PyrSlotMachine extends PyrPlugin implements Listener {
 	// ----------------------------------------------------------------------
 
 	@Override
-	protected void enable() {
+	protected boolean enable() {
 		// call reload
-		innerReload();
-		// registration
+		reloadInner();
+		// events
 		Bukkit.getPluginManager().registerEvents(this, this);
-		registerCommand(new Command(this, "machine", "machine", new CommandCreate(), new CommandSetcase(), new CommandSetbutton()));
+		// commands
+		CommandRoot root = new CommandRoot(this, Utils.asList("machine"), null, null, false);
+		root.addChild(new CommandCreate());
+		root.addChild(new CommandSetbutton());
+		root.addChild(new CommandSetcase());
+		return true;
 	}
 
 	// ----------------------------------------------------------------------

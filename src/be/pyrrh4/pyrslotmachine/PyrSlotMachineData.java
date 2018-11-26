@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import org.bukkit.Location;
 
-import be.pyrrh4.core.PluginData;
+import be.pyrrh4.core.storage.PluginData;
 import be.pyrrh4.core.util.Utils;
 import be.pyrrh4.pyrslotmachine.machine.Machine;
 
@@ -42,9 +42,9 @@ public class PyrSlotMachineData extends PluginData {
 		return machines;
 	}
 
-	public PyrSlotMachineData addMachine(Machine machine) {
+	public void addMachine(Machine machine) {
 		machines.add(machine);
-		return this;
+		mustSave(true);
 	}
 
 }

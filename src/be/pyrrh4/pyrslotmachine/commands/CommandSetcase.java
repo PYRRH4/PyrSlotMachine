@@ -1,42 +1,46 @@
 package be.pyrrh4.pyrslotmachine.commands;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import be.pyrrh4.core.Perm;
+import be.pyrrh4.core.command.CommandArgument;
 import be.pyrrh4.core.command.CommandCall;
-import be.pyrrh4.core.command.CommandPattern;
-import be.pyrrh4.core.messenger.Messenger;
-import be.pyrrh4.core.messenger.Messenger.Level;
+import be.pyrrh4.core.command.Param;
+import be.pyrrh4.core.material.Mat;
+import be.pyrrh4.core.messenger.Locale;
+import be.pyrrh4.core.util.Utils;
 import be.pyrrh4.pyrslotmachine.PyrSlotMachine;
 import be.pyrrh4.pyrslotmachine.machine.Machine;
 
-public class CommandSetcase extends CommandPattern {
+public class CommandSetcase extends CommandArgument {
+
+	private static final Param paramMachine = new Param(Utils.asList("machine", "m"), "id", Perm.PYRSLOTMACHINE_ADMIN, true);
+	private static final Param paramCase = new Param(Utils.asList("case"), "id", Perm.PYRSLOTMACHINE_ADMIN, true);
 
 	public CommandSetcase() {
-		super("setcase [string]%id [integer]%1/2/3", "set a case (the block you're pointing at)", "pyrslotmachine.admin", true);
+		super(PyrSlotMachine.instance(), Utils.asList("setcase"), "set a machine case", Perm.PYRSLOTMACHINE_ADMIN, true, paramMachine, paramCase);
 	}
 
 	@Override
 	public void perform(CommandCall call) {
 		Player sender = call.getSenderAsPlayer();
-		String id = call.getArgAsString(this, 1).toLowerCase();
-		Machine machine = PyrSlotMachine.instance().getData().getMachine(id);
-		if (machine == null) {
-			Messenger.send(sender, Level.SEVERE_INFO, "PyrSlotMachine", "Machine with id " + id + " doesn't exists.");
-			return;
+		Machine machine = paramMachine.get(call, PyrSlotMachine.MACHINE_PARSER);
+		int caseId = paramCase.getInt(call);
+		if (machine != null && caseId != Integer.MIN_VALUE) {
+			// block
+			Block block = sender.getTargetBlock(null, 5);
+			if (block == null || Mat.AIR.isMat(block)) {
+				Locale.MSG_GENERIC_INVALIDCROSSHAIRBLOCK.getActive().send(sender, "{plugin}", PyrSlotMachine.instance().getName());
+				return;
+			}
+			// set case
+			Location loc = block.getLocation().clone().add(0.5D, 0.1D, 0.5D);
+			machine.setCase(caseId, loc);
+			PyrSlotMachine.instance().getData().mustSave(true);
+			Locale.MSG_PYRSLOTMACHINE_SETCASE.getActive().send(sender, "{case}", caseId, "{machine}", machine.getId());
 		}
-		Block block = sender.getTargetBlock(null, 5);
-		if (block == null || block.getType().equals(Material.AIR)) {
-			Messenger.send(sender, Level.SEVERE_INFO, "PyrSlotMachine", "You're not pointing a valid block.");
-			return;
-		}
-		int caseId = call.getArgAsInt(this, 2);
-		Location loc = block.getLocation().clone().add(0.5D, 0.1D, 0.5D);
-		machine.setCase(caseId, loc);
-		PyrSlotMachine.instance().getData().save();
-		Messenger.send(sender, Level.NORMAL_SUCCESS, "PyrSlotMachine", "Case " + caseId + " has been defined for machine " + id + ".");
 	}
 
 }

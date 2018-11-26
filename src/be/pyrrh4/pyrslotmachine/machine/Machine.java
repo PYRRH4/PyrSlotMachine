@@ -13,11 +13,9 @@ public class Machine {
 	private Location button;
 	private transient RunningMachine running = null;
 
-	public Machine() {}
-
-	public Machine(String id, String type) {
+	public Machine(String id, MachineType type) {
 		this.id = id;
-		this.type = type.toLowerCase();
+		this.type = type.getId();
 	}
 
 	// getters
@@ -29,8 +27,8 @@ public class Machine {
 		return type;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setType(MachineType type) {
+		this.type = type.getId();
 	}
 
 	public Location getCase(int id) {
