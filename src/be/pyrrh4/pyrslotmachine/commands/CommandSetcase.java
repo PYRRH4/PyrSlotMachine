@@ -1,6 +1,10 @@
 package be.pyrrh4.pyrslotmachine.commands;
 
+import java.util.Set;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -30,8 +34,9 @@ public class CommandSetcase extends CommandArgument {
 		int caseId = paramCase.getInt(call);
 		if (machine != null && caseId != Integer.MIN_VALUE) {
 			// block
-			Block block = sender.getTargetBlock(null, 5);
-			if (block == null || Mat.AIR.isMat(block)) {
+			Block block = sender.getTargetBlock((Set<Material>) null, 5);
+			Bukkit.getLogger().info("block : " + block);
+			if (block == null || Mat.from(block).isAir()) {
 				Locale.MSG_GENERIC_INVALIDCROSSHAIRBLOCK.getActive().send(sender, "{plugin}", PyrSlotMachine.instance().getName());
 				return;
 			}

@@ -11,15 +11,18 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+import be.pyrrh4.core.Perm;
 import be.pyrrh4.core.PyrPlugin;
 import be.pyrrh4.core.command.CommandRoot;
 import be.pyrrh4.core.command.Param;
 import be.pyrrh4.core.command.ParamParser;
+import be.pyrrh4.core.economy.EconomyHandler;
 import be.pyrrh4.core.gui.ItemData;
 import be.pyrrh4.core.messenger.Locale;
 import be.pyrrh4.core.messenger.Messenger;
 import be.pyrrh4.core.messenger.Messenger.Level;
 import be.pyrrh4.core.util.Utils;
+import be.pyrrh4.core.versioncompat.sound.Sound;
 import be.pyrrh4.pyrslotmachine.commands.CommandCreate;
 import be.pyrrh4.pyrslotmachine.commands.CommandSetbutton;
 import be.pyrrh4.pyrslotmachine.commands.CommandSetcase;
@@ -68,7 +71,7 @@ public class PyrSlotMachine extends PyrPlugin implements Listener {
 			// doesn't exist
 			MachineType machine = PyrSlotMachine.instance().getMachineType(value);
 			if (machine == null) {
-				Locale.MSG_PYRSLOTMACHINE_INVALIDMACHINETYPEPARAM.getActive().send("{parameter}", parameter.toString(), "{value}", value);
+				Locale.MSG_PYRSLOTMACHINE_INVALIDMACHINETYPEPARAM.getActive().send(sender, "{parameter}", parameter.toString(), "{value}", value);
 				return null;
 			}
 			// exists
@@ -127,8 +130,11 @@ public class PyrSlotMachine extends PyrPlugin implements Listener {
 		types.clear();
 		for (String id : getConfiguration().getKeysForSection("types", false)) {
 			double cost = PyrSlotMachine.instance().getConfiguration().getInt("types." + id + ".cost");
+			Sound animationSound = getConfiguration().getEnumValue("types." + id + ".animation_sound", Sound.class, Sound.WOOD_CLICK);
+			Sound winSound = getConfiguration().getEnumValue("types." + id + ".win_sound", Sound.class, Sound.ORB_PICKUP);
+			Sound loseSound = getConfiguration().getEnumValue("types." + id + ".lose_sound", Sound.class, Sound.ANVIL_BREAK);
 			ArrayList<ItemData> prizes = PyrSlotMachine.instance().getConfiguration().getItems("types." + id + ".prizes");
-			types.put(id, new MachineType(id, cost, prizes));
+			types.put(id, new MachineType(id, cost, animationSound, winSound, loseSound, prizes));
 		}
 	}
 
@@ -144,6 +150,7 @@ public class PyrSlotMachine extends PyrPlugin implements Listener {
 		Bukkit.getPluginManager().registerEvents(this, this);
 		// commands
 		CommandRoot root = new CommandRoot(this, Utils.asList("machine"), null, null, false);
+		registerCommand(root, Perm.PYRSLOTMACHINE_ADMIN);
 		root.addChild(new CommandCreate());
 		root.addChild(new CommandSetbutton());
 		root.addChild(new CommandSetcase());
@@ -174,6 +181,15 @@ public class PyrSlotMachine extends PyrPlugin implements Listener {
 				}
 				if (machine.getCase(1) == null || machine.getCase(2) == null || machine.getCase(3) == null) {
 					Messenger.send(player, Level.SEVERE_INFO, "PyrSlotMachine", "Machine " + machine.getId() + " isn't correctly defined (need 3 cases).");
+					return;
+				}
+				if (type.getPrizes().size() < 5) {
+					Messenger.send(player, Level.SEVERE_INFO, "PyrSlotMachine", "Machine " + machine.getId() + " isn't correctly defined (need at least 5 items).");
+					return;
+				}
+				double balance = EconomyHandler.INSTANCE.get(player);
+				if (balance < type.getCost()) {
+					Locale.MSG_GENERIC_NOMONEY.send(player, "{plugin}", getName(), "{balance}", Utils.round(balance), "{money}", Utils.round(type.getCost()));
 					return;
 				}
 				RunningMachine running = new RunningMachine(player, machine, type);

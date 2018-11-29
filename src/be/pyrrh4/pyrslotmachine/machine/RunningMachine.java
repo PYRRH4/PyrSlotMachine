@@ -13,7 +13,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import be.pyrrh4.core.economy.EconomyHandler;
-import be.pyrrh4.core.gui.GUI;
 import be.pyrrh4.core.gui.ItemData;
 import be.pyrrh4.core.material.Mat;
 import be.pyrrh4.core.messenger.Locale;
@@ -40,7 +39,6 @@ public class RunningMachine {
 		this.machineType = machineType;
 		// precalculate prize chances
 		results.addAll(machineType.getPrizes());
-		results.addAll(MachineUtils.RANDOM_RESULTS);
 		// precalculate result
 		ArrayList<ItemData> chances = new ArrayList<ItemData>();
 		for (ItemData it : machineType.getPrizes()) {
@@ -64,6 +62,9 @@ public class RunningMachine {
 
 	// start
 	public void start() {
+		// take money
+		EconomyHandler.INSTANCE.take(player, machineType.getCost());
+		// start
 		taskId = new BukkitRunnable() {
 			private long delay = 2L, currentDelay = 0L, totalDuration = 0L;
 			@Override
@@ -88,6 +89,8 @@ public class RunningMachine {
 					setCase(1, totalDuration >= 180L ? tend1 : Utils.random(results));
 					setCase(2, totalDuration >= 210L ? tend2 : Utils.random(results));
 					setCase(3, totalDuration >= 240L ? tend3 : Utils.random(results));
+					// sound
+					if (machineType.getAnimationSound() != null) machineType.getAnimationSound().play(player.getPlayer());
 				}
 			}
 		}.runTaskTimer(PyrSlotMachine.instance(), 0L, 1L).getTaskId();
@@ -102,7 +105,6 @@ public class RunningMachine {
 			}
 			// add new
 			ItemStack itm = item.getItemStack();
-			itm.setAmount(64);
 			Item it = loc.getWorld().dropItem(loc, itm);
 			it.setPickupDelay(Integer.MAX_VALUE);
 			it.setVelocity(new Vector(0, 0, 0));
@@ -121,25 +123,18 @@ public class RunningMachine {
 			Player player = this.player.getPlayer();
 			// loose
 			if (result == null) {
-				Locale.MSG_PYRSLOTMACHINE_LOSE.getActive().send(player);
-				Sound.ANVIL_BREAK.play(machine.getCase(1));
+				Locale.MSG_PYRSLOTMACHINE_LOSE.send(player);
+				// play sound
+				if (machineType.getLoseSound() != null) machineType.getLoseSound().play(player.getPlayer());
 			}
 			// win
 			else {
 				// give item
-				ItemStack item = result.getItemStack();
-				if (GUI.firstBlank(player.getInventory()) == -1) {
-					player.getWorld().dropItemNaturally(player.getLocation(), item);
-				} else {
-					player.getInventory().addItem(item);
-					player.updateInventory();
-				}
+				result.give(player);
 				// message
-				Locale.MSG_PYRSLOTMACHINE_WIN.getActive().send(player, "{item}", MachineUtils.describe(item));
+				Locale.MSG_PYRSLOTMACHINE_WIN.getActive().send(player, "{item}", MachineUtils.describe(result.getItemStack()));
 				// play sound
-				Sound.NOTE_PLING.play(machine.getCase(1));
-				// add money
-				EconomyHandler.INSTANCE.add(player, machineType.getCost());
+				if (machineType.getWinSound() != null) machineType.getWinSound().play(player.getPlayer());
 			}
 		}
 		// fail, so refund
