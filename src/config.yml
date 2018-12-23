@@ -2,8 +2,22 @@
 # Configuration file for PyrParticles
 #----------------------------------------------------------------------------------------------------
 
-# Machines types
+# Data management
+data:
+  # Back end (JSON, MYSQL) (default JSON)
+  # If you enable MySQL here, you should definitely enable it for PyrCore as well
+  backend: JSON
+  # Synchronization delay (in seconds) (disabled with -1, by default)
+  # If this is enabled, the plugin will check the stored data (json/mysql), and if there's new/different data, cached data will be overriden here
+  sync_delay: -1
+  # MySQL identifiers (if backend is MYSQL)
+#  mysql:
+#    host: mysql.myserver.com
+#    name: mydatabase
+#    user: username
+#    pass: pwd
 
+# Machines types
 types:
   gold:
     cost: 100.0

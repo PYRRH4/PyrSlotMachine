@@ -2,23 +2,24 @@ package be.pyrrh4.pyrslotmachine.commands;
 
 import org.bukkit.entity.Player;
 
-import be.pyrrh4.core.Perm;
-import be.pyrrh4.core.command.CommandArgument;
-import be.pyrrh4.core.command.CommandCall;
-import be.pyrrh4.core.command.Param;
-import be.pyrrh4.core.messenger.Locale;
-import be.pyrrh4.core.util.Utils;
+import be.pyrrh4.pyrcore.PCLocale;
+import be.pyrrh4.pyrcore.lib.command.CommandArgument;
+import be.pyrrh4.pyrcore.lib.command.CommandCall;
+import be.pyrrh4.pyrcore.lib.command.Param;
+import be.pyrrh4.pyrcore.lib.util.Utils;
+import be.pyrrh4.pyrslotmachine.PSMLocale;
+import be.pyrrh4.pyrslotmachine.PSMPerm;
 import be.pyrrh4.pyrslotmachine.PyrSlotMachine;
-import be.pyrrh4.pyrslotmachine.machine.Machine;
+import be.pyrrh4.pyrslotmachine.data.Machine;
 import be.pyrrh4.pyrslotmachine.machine.MachineType;
 
 public class CommandCreate extends CommandArgument {
 
-	private static final Param paramMachine = new Param(Utils.asList("machine", "m"), "id", Perm.PYRSLOTMACHINE_ADMIN, true);
-	private static final Param paramType = new Param(Utils.asList("type", "t"), "id", Perm.PYRSLOTMACHINE_ADMIN, true);
+	private static final Param paramMachine = new Param(Utils.asList("machine", "m"), "id", PSMPerm.PYRSLOTMACHINE_ADMIN, true);
+	private static final Param paramType = new Param(Utils.asList("type", "t"), "id", PSMPerm.PYRSLOTMACHINE_ADMIN, true);
 
 	public CommandCreate() {
-		super(PyrSlotMachine.instance(), Utils.asList("create", "new"), "create a machine", Perm.PYRSLOTMACHINE_ADMIN, true, paramMachine, paramType);
+		super(PyrSlotMachine.inst(), Utils.asList("create", "new"), "create a machine", PSMPerm.PYRSLOTMACHINE_ADMIN, true, paramMachine, paramType);
 	}
 
 	@Override
@@ -28,14 +29,14 @@ public class CommandCreate extends CommandArgument {
 		MachineType type = paramType.get(call, PyrSlotMachine.MACHINETYPE_PARSER);
 		if (id != null && type != null) {
 			// already taken
-			if (PyrSlotMachine.instance().getData().getMachine(id) != null) {
-				Locale.MSG_GENERIC_NAMETAKEN.getActive().send(sender, "{plugin}", PyrSlotMachine.instance().getName(), "{name}", id);
+			if (PyrSlotMachine.inst().getData().getMachines().getElement(id) != null) {
+				PCLocale.MSG_GENERIC_IDTAKEN.send(sender, "{plugin}", PyrSlotMachine.inst().getName(), "{name}", id);
 				return;
 			}
 			// create
 			Machine machine = new Machine(id, type);
-			PyrSlotMachine.instance().getData().addMachine(machine);
-			Locale.MSG_PYRSLOTMACHINE_CREATE.getActive().send(sender, "{id}", id);
+			PyrSlotMachine.inst().getData().getMachines().add(machine);
+			PSMLocale.MSG_PYRSLOTMACHINE_CREATE.send(sender, "{id}", id);
 		}
 	}
 

@@ -3,21 +3,21 @@ package be.pyrrh4.pyrslotmachine.commands;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import be.pyrrh4.core.Perm;
-import be.pyrrh4.core.command.CommandArgument;
-import be.pyrrh4.core.command.CommandCall;
-import be.pyrrh4.core.command.Param;
-import be.pyrrh4.core.messenger.Locale;
-import be.pyrrh4.core.util.Utils;
+import be.pyrrh4.pyrcore.lib.command.CommandArgument;
+import be.pyrrh4.pyrcore.lib.command.CommandCall;
+import be.pyrrh4.pyrcore.lib.command.Param;
+import be.pyrrh4.pyrcore.lib.util.Utils;
+import be.pyrrh4.pyrslotmachine.PSMLocale;
+import be.pyrrh4.pyrslotmachine.PSMPerm;
 import be.pyrrh4.pyrslotmachine.PyrSlotMachine;
-import be.pyrrh4.pyrslotmachine.machine.Machine;
+import be.pyrrh4.pyrslotmachine.data.Machine;
 
 public class CommandSetbutton extends CommandArgument {
 
-	private static final Param paramMachine = new Param(Utils.asList("machine", "m"), "id", Perm.PYRSLOTMACHINE_ADMIN, true);
+	private static final Param paramMachine = new Param(Utils.asList("machine", "m"), "id", PSMPerm.PYRSLOTMACHINE_ADMIN, true);
 
 	public CommandSetbutton() {
-		super(PyrSlotMachine.instance(), Utils.asList("setbutton"), "set the machine button", Perm.PYRSLOTMACHINE_ADMIN, true, paramMachine);
+		super(PyrSlotMachine.inst(), Utils.asList("setbutton"), "set the machine button", PSMPerm.PYRSLOTMACHINE_ADMIN, true, paramMachine);
 	}
 
 	@Override
@@ -28,13 +28,12 @@ public class CommandSetbutton extends CommandArgument {
 			// invalid button
 			Block block = sender.getTargetBlock(null, 5);
 			if (block == null || !block.getType().toString().contains("BUTTON")) {
-				Locale.MSG_PYRSLOTMACHINE_INVALIDBUTTON.getActive().send(sender);
+				PSMLocale.MSG_PYRSLOTMACHINE_INVALIDBUTTON.send(sender);
 				return;
 			}
 			// set button
 			machine.setButton(block.getLocation());
-			PyrSlotMachine.instance().getData().mustSave(true);
-			Locale.MSG_PYRSLOTMACHINE_SETBUTTON.getActive().send(sender, "{machine}", machine.getId());
+			PSMLocale.MSG_PYRSLOTMACHINE_SETBUTTON.send(sender, "{machine}", machine.getId());
 		}
 	}
 

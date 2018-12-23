@@ -2,29 +2,29 @@ package be.pyrrh4.pyrslotmachine.commands;
 
 import java.util.Set;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import be.pyrrh4.core.Perm;
-import be.pyrrh4.core.command.CommandArgument;
-import be.pyrrh4.core.command.CommandCall;
-import be.pyrrh4.core.command.Param;
-import be.pyrrh4.core.material.Mat;
-import be.pyrrh4.core.messenger.Locale;
-import be.pyrrh4.core.util.Utils;
+import be.pyrrh4.pyrcore.PCLocale;
+import be.pyrrh4.pyrcore.lib.command.CommandArgument;
+import be.pyrrh4.pyrcore.lib.command.CommandCall;
+import be.pyrrh4.pyrcore.lib.command.Param;
+import be.pyrrh4.pyrcore.lib.material.Mat;
+import be.pyrrh4.pyrcore.lib.util.Utils;
+import be.pyrrh4.pyrslotmachine.PSMLocale;
+import be.pyrrh4.pyrslotmachine.PSMPerm;
 import be.pyrrh4.pyrslotmachine.PyrSlotMachine;
-import be.pyrrh4.pyrslotmachine.machine.Machine;
+import be.pyrrh4.pyrslotmachine.data.Machine;
 
 public class CommandSetcase extends CommandArgument {
 
-	private static final Param paramMachine = new Param(Utils.asList("machine", "m"), "id", Perm.PYRSLOTMACHINE_ADMIN, true);
-	private static final Param paramCase = new Param(Utils.asList("case"), "id", Perm.PYRSLOTMACHINE_ADMIN, true);
+	private static final Param paramMachine = new Param(Utils.asList("machine", "m"), "id", PSMPerm.PYRSLOTMACHINE_ADMIN, true);
+	private static final Param paramCase = new Param(Utils.asList("case"), "id", PSMPerm.PYRSLOTMACHINE_ADMIN, true);
 
 	public CommandSetcase() {
-		super(PyrSlotMachine.instance(), Utils.asList("setcase"), "set a machine case", Perm.PYRSLOTMACHINE_ADMIN, true, paramMachine, paramCase);
+		super(PyrSlotMachine.inst(), Utils.asList("setcase"), "set a machine case", PSMPerm.PYRSLOTMACHINE_ADMIN, true, paramMachine, paramCase);
 	}
 
 	@Override
@@ -35,16 +35,14 @@ public class CommandSetcase extends CommandArgument {
 		if (machine != null && caseId != Integer.MIN_VALUE) {
 			// block
 			Block block = sender.getTargetBlock((Set<Material>) null, 5);
-			Bukkit.getLogger().info("block : " + block);
 			if (block == null || Mat.from(block).isAir()) {
-				Locale.MSG_GENERIC_INVALIDCROSSHAIRBLOCK.getActive().send(sender, "{plugin}", PyrSlotMachine.instance().getName());
+				PCLocale.MSG_GENERIC_INVALIDCROSSHAIRBLOCK.send(sender, "{plugin}", PyrSlotMachine.inst().getName());
 				return;
 			}
 			// set case
 			Location loc = block.getLocation().clone().add(0.5D, 0.1D, 0.5D);
 			machine.setCase(caseId, loc);
-			PyrSlotMachine.instance().getData().mustSave(true);
-			Locale.MSG_PYRSLOTMACHINE_SETCASE.getActive().send(sender, "{case}", caseId, "{machine}", machine.getId());
+			PSMLocale.MSG_PYRSLOTMACHINE_SETCASE.send(sender, "{case}", caseId, "{machine}", machine.getId());
 		}
 	}
 

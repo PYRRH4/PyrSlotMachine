@@ -1,9 +1,9 @@
 package be.pyrrh4.pyrslotmachine.machine;
 
-import java.util.ArrayList;
+import java.util.List;
 
-import be.pyrrh4.core.gui.ItemData;
-import be.pyrrh4.core.versioncompat.sound.Sound;
+import be.pyrrh4.pyrcore.lib.gui.ItemData;
+import be.pyrrh4.pyrcore.lib.versioncompat.sound.Sound;
 
 public class MachineType {
 
@@ -11,9 +11,9 @@ public class MachineType {
 	private String id;
 	private double cost;
 	private Sound animationSound, winSound, loseSound;
-	private ArrayList<ItemData> prizes;
+	private List<ItemData> prizes;
 
-	public MachineType(String id, double cost, Sound animationSound, Sound winSound, Sound loseSound, ArrayList<ItemData> prizes) {
+	public MachineType(String id, double cost, Sound animationSound, Sound winSound, Sound loseSound, List<ItemData> prizes) {
 		this.id = id;
 		this.cost = cost;
 		this.animationSound = animationSound;
@@ -48,7 +48,7 @@ public class MachineType {
 		return loseSound;
 	}
 
-	public ArrayList<ItemData> getPrizes() {
+	public List<ItemData> getPrizes() {
 		return prizes;
 	}
 

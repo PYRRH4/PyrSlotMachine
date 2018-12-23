@@ -2,6 +2,8 @@ package be.pyrrh4.pyrslotmachine.machine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -12,14 +14,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import be.pyrrh4.core.economy.EconomyHandler;
-import be.pyrrh4.core.gui.ItemData;
-import be.pyrrh4.core.material.Mat;
-import be.pyrrh4.core.messenger.Locale;
-import be.pyrrh4.core.util.Utils;
-import be.pyrrh4.core.versioncompat.particle.ParticleManager;
-import be.pyrrh4.core.versioncompat.sound.Sound;
+import be.pyrrh4.pyrcore.PyrCore;
+import be.pyrrh4.pyrcore.lib.gui.ItemData;
+import be.pyrrh4.pyrcore.lib.material.Mat;
+import be.pyrrh4.pyrcore.lib.util.Utils;
+import be.pyrrh4.pyrcore.lib.versioncompat.particle.ParticleManager;
+import be.pyrrh4.pyrcore.lib.versioncompat.sound.Sound;
+import be.pyrrh4.pyrslotmachine.PSMLocale;
 import be.pyrrh4.pyrslotmachine.PyrSlotMachine;
+import be.pyrrh4.pyrslotmachine.data.Machine;
 import be.pyrrh4.pyrslotmachine.util.MachineUtils;
 
 public class RunningMachine {
@@ -28,10 +31,10 @@ public class RunningMachine {
 	private OfflinePlayer player;
 	private Machine machine;
 	private MachineType machineType;
-	private ArrayList<ItemData> results = new ArrayList<ItemData>();
+	private List<ItemData> results = new ArrayList<ItemData>();
 	private ItemData tend1, tend2, tend3, result;
 	private int taskId = -1;
-	private HashMap<Integer, Item> actualItems = new HashMap<Integer, Item>();
+	private Map<Integer, Item> actualItems = new HashMap<Integer, Item>();
 
 	public RunningMachine(OfflinePlayer player, Machine machine, MachineType machineType) {
 		this.player = player;
@@ -40,7 +43,7 @@ public class RunningMachine {
 		// precalculate prize chances
 		results.addAll(machineType.getPrizes());
 		// precalculate result
-		ArrayList<ItemData> chances = new ArrayList<ItemData>();
+		List<ItemData> chances = new ArrayList<ItemData>();
 		for (ItemData it : machineType.getPrizes()) {
 			for (int i = 0; i < it.getChance(); i++) {
 				chances.add(it);
@@ -63,7 +66,7 @@ public class RunningMachine {
 	// start
 	public void start() {
 		// take money
-		EconomyHandler.INSTANCE.take(player, machineType.getCost());
+		PyrCore.inst().getVaultIntegration().take(player, machineType.getCost());
 		// start
 		taskId = new BukkitRunnable() {
 			private long delay = 2L, currentDelay = 0L, totalDuration = 0L;
@@ -93,7 +96,7 @@ public class RunningMachine {
 					if (machineType.getAnimationSound() != null) machineType.getAnimationSound().play(player.getPlayer());
 				}
 			}
-		}.runTaskTimer(PyrSlotMachine.instance(), 0L, 1L).getTaskId();
+		}.runTaskTimer(PyrSlotMachine.inst(), 0L, 1L).getTaskId();
 	}
 
 	private void setCase(int id, ItemData item) {
@@ -123,7 +126,7 @@ public class RunningMachine {
 			Player player = this.player.getPlayer();
 			// loose
 			if (result == null) {
-				Locale.MSG_PYRSLOTMACHINE_LOSE.send(player);
+				PSMLocale.MSG_PYRSLOTMACHINE_LOSE.send(player);
 				// play sound
 				if (machineType.getLoseSound() != null) machineType.getLoseSound().play(player.getPlayer());
 			}
@@ -132,14 +135,14 @@ public class RunningMachine {
 				// give item
 				result.give(player);
 				// message
-				Locale.MSG_PYRSLOTMACHINE_WIN.getActive().send(player, "{item}", MachineUtils.describe(result.getItemStack()));
+				PSMLocale.MSG_PYRSLOTMACHINE_WIN.send(player, "{item}", MachineUtils.describe(result.getItemStack()));
 				// play sound
 				if (machineType.getWinSound() != null) machineType.getWinSound().play(player.getPlayer());
 			}
 		}
 		// fail, so refund
 		else {
-			EconomyHandler.INSTANCE.add(player, machineType.getCost());
+			PyrCore.inst().getVaultIntegration().add(player, machineType.getCost());
 		}
 		// clear items
 		for (Item item : actualItems.values()) {
