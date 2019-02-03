@@ -15,8 +15,8 @@ import be.pyrrh4.pyrslotmachine.machine.MachineType;
 
 public class CommandCreate extends CommandArgument {
 
-	private static final Param paramMachine = new Param(Utils.asList("machine", "m"), "id", PSMPerm.PYRSLOTMACHINE_ADMIN, true);
-	private static final Param paramType = new Param(Utils.asList("type", "t"), "id", PSMPerm.PYRSLOTMACHINE_ADMIN, true);
+	private static final Param paramMachine = new Param(Utils.asList("machine", "m"), "id", PSMPerm.PYRSLOTMACHINE_ADMIN, true, true);
+	private static final Param paramType = new Param(Utils.asList("type", "t"), "id", PSMPerm.PYRSLOTMACHINE_ADMIN, true, true);
 
 	public CommandCreate() {
 		super(PyrSlotMachine.inst(), Utils.asList("create", "new"), "create a machine", PSMPerm.PYRSLOTMACHINE_ADMIN, true, paramMachine, paramType);

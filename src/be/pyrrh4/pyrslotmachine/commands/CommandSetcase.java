@@ -20,8 +20,8 @@ import be.pyrrh4.pyrslotmachine.data.Machine;
 
 public class CommandSetcase extends CommandArgument {
 
-	private static final Param paramMachine = new Param(Utils.asList("machine", "m"), "id", PSMPerm.PYRSLOTMACHINE_ADMIN, true);
-	private static final Param paramCase = new Param(Utils.asList("case"), "id", PSMPerm.PYRSLOTMACHINE_ADMIN, true);
+	private static final Param paramMachine = new Param(Utils.asList("machine", "m"), "id", PSMPerm.PYRSLOTMACHINE_ADMIN, true, true);
+	private static final Param paramCase = new Param(Utils.asList("case"), "id", PSMPerm.PYRSLOTMACHINE_ADMIN, true, true);
 
 	public CommandSetcase() {
 		super(PyrSlotMachine.inst(), Utils.asList("setcase"), "set a machine case", PSMPerm.PYRSLOTMACHINE_ADMIN, true, paramMachine, paramCase);

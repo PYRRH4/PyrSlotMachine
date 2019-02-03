@@ -14,7 +14,7 @@ import be.pyrrh4.pyrslotmachine.data.Machine;
 
 public class CommandSetbutton extends CommandArgument {
 
-	private static final Param paramMachine = new Param(Utils.asList("machine", "m"), "id", PSMPerm.PYRSLOTMACHINE_ADMIN, true);
+	private static final Param paramMachine = new Param(Utils.asList("machine", "m"), "id", PSMPerm.PYRSLOTMACHINE_ADMIN, true, true);
 
 	public CommandSetbutton() {
 		super(PyrSlotMachine.inst(), Utils.asList("setbutton"), "set the machine button", PSMPerm.PYRSLOTMACHINE_ADMIN, true, paramMachine);

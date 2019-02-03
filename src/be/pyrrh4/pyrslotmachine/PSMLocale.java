@@ -18,14 +18,14 @@ public class PSMLocale {
 	
 	public static final Text MSG_PYRSLOTMACHINE_INVALIDMACHINEPARAM = new Text(
 			"MSG_PYRSLOTMACHINE_INVALIDMACHINEPARAM", file,
-			"en_US", "&6PyrSlotMachine >> &7Parameter &c{parameter} [{value}] &7should be an existing machine.",
-			"fr_FR", "&6PyrSlotMachine >> &7Le paramètre &c{parameter} [{value}] &7devrait être une machine existante."
+			"en_US", "&6PyrSlotMachine >> &7Parameter &c{parameter} &7should be an existing machine.",
+			"fr_FR", "&6PyrSlotMachine >> &7Le paramètre &c{parameter} &7devrait être une machine existante."
 			);
 
 	public static final Text MSG_PYRSLOTMACHINE_INVALIDMACHINETYPEPARAM = new Text(
 			"MSG_PYRSLOTMACHINE_INVALIDMACHINETYPEPARAM", file,
-			"en_US", "&6PyrSlotMachine >> &7Parameter &c{parameter} [{value}] &7should be an existing machine type.",
-			"fr_FR", "&6PyrSlotMachine >> &7Le paramètre &c{parameter} [{value}] &7devrait être un type de machine existant."
+			"en_US", "&6PyrSlotMachine >> &7Parameter &c{parameter} &7should be an existing machine type.",
+			"fr_FR", "&6PyrSlotMachine >> &7Le paramètre &c{parameter} &7devrait être un type de machine existant."
 			);
 
 	public static final Text MSG_PYRSLOTMACHINE_INVALIDBUTTON = new Text(

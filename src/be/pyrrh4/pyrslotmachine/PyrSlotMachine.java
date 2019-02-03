@@ -62,7 +62,7 @@ public class PyrSlotMachine extends PyrPlugin implements Listener {
 			// doesn't exist
 			Machine machine = PyrSlotMachine.inst().getData().getMachines().getElement(value);
 			if (machine == null) {
-				PSMLocale.MSG_PYRSLOTMACHINE_INVALIDMACHINEPARAM.send("{parameter}", parameter.toString(), "{value}", value);
+				PSMLocale.MSG_PYRSLOTMACHINE_INVALIDMACHINEPARAM.send(sender, "{parameter}", "-" + parameter.toString() + (parameter.getDescription() == null ? "" : ":" + value));
 				return null;
 			}
 			// exists
@@ -76,7 +76,7 @@ public class PyrSlotMachine extends PyrPlugin implements Listener {
 			// doesn't exist
 			MachineType machine = PyrSlotMachine.inst().getMachineType(value);
 			if (machine == null) {
-				PSMLocale.MSG_PYRSLOTMACHINE_INVALIDMACHINETYPEPARAM.send(sender, "{parameter}", parameter.toString(), "{value}", value);
+				PSMLocale.MSG_PYRSLOTMACHINE_INVALIDMACHINETYPEPARAM.send(sender, "{parameter}", "-" + parameter.toString() + (parameter.getDescription() == null ? "" : ":" + value));
 				return null;
 			}
 			// exists
